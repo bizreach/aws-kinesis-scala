@@ -11,7 +11,7 @@ import org.json4s.{DefaultFormats, Extraction, Formats}
 import org.slf4j.LoggerFactory
 
 class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
-                                    credentials: Class[_ <: AWSCredentialsProvider],
+                                    credentials: AWSCredentialsProvider,
                                     chunk: Int, endpoint: Option[String]) extends Serializable {
   private val logger = LoggerFactory.getLogger(getClass)
 
@@ -64,14 +64,14 @@ object KinesisRDDWriter {
   private val cache = collection.concurrent.TrieMap.empty[Regions, AmazonKinesis]
 
 
-  private val client: Class[_ <: AWSCredentialsProvider] => Regions => AmazonKinesis = {
+  private val client: AWSCredentialsProvider => Regions => AmazonKinesis = {
     credentials => implicit region =>
-      cache.getOrElseUpdate(region, AmazonKinesis(credentials.getConstructor().newInstance()))
+      cache.getOrElseUpdate(region, AmazonKinesis(credentials))
   }
 
-  private val endpointClient: Class[_ <: AWSCredentialsProvider] => String => Regions => AmazonKinesis  = {
+  private val endpointClient: AWSCredentialsProvider => String => Regions => AmazonKinesis  = {
     credentials => endpoint => implicit region =>
-      cache.getOrElseUpdate(region, AmazonKinesis(credentials.getConstructor().newInstance(), new EndpointConfiguration(endpoint, region.getName)))
+      cache.getOrElseUpdate(region, AmazonKinesis(credentials, new EndpointConfiguration(endpoint, region.getName)))
   }
 
 }
