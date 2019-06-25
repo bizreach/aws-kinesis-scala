@@ -14,6 +14,10 @@ import scala.language.implicitConversions
 
 package object kinesisfirehose {
 
+  private[this] implicit class JListConverters[A](list: java.util.List[A]) {
+    def immutableSeq: Seq[A] = list.asScala.toSeq
+  }
+
   case class PutRecordRequest(deliveryStreamName: String, record: Array[Byte])
 
   implicit def convertPutRecordRequest(request: PutRecordRequest): AWSPutRecordRequest = {
@@ -48,7 +52,7 @@ package object kinesisfirehose {
   implicit def convertPutRecordBatchResult(result: AWSPutRecordBatchResult): PutRecordBatchResult = {
     PutRecordBatchResult(
       failedPutCount = result.getFailedPutCount,
-      records = result.getRequestResponses.asScala.map { record =>
+      records = result.getRequestResponses.immutableSeq.map { record =>
         PutRecordBatchResponseEntry(
           recordId = record.getRecordId,
           errorCode = record.getErrorCode,
