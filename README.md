@@ -11,12 +11,12 @@ Add a following dependency into your `build.sbt`.
 
 core only:
 ```scala
-libraryDependencies += "jp.co.bizreach" %% "aws-kinesis-scala" % "0.0.11"
+libraryDependencies += "jp.co.bizreach" %% "aws-kinesis-scala" % "0.0.12"
 ```
 
 use spark integration:
 ```scala
-libraryDependencies += "jp.co.bizreach" %% "aws-kinesis-spark" % "0.0.11"
+libraryDependencies += "jp.co.bizreach" %% "aws-kinesis-spark" % "0.0.12"
 ```
 
 ## Usage
