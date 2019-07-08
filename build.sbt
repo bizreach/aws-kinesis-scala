@@ -58,17 +58,18 @@ lazy val root = (project in file("."))
     packagedArtifacts := Map.empty
   )
 
-val sdkVersion = "1.11.550"
+val sdkVersion = "1.11.579"
 val sparkVersion = "2.4.3"
 
 lazy val core = project
   .settings(commonSettings: _*)
   .settings(
     name := "aws-kinesis-scala",
+    crossScalaVersions += "2.13.0",
     libraryDependencies ++= Seq(
       "com.amazonaws" %  "aws-java-sdk-kinesis" % sdkVersion,
       "org.slf4j"     %  "slf4j-api"            % "1.7.26",
-      "org.scalatest" %% "scalatest"            % "3.0.7" % "test"
+      "org.scalatest" %% "scalatest"            % "3.0.8" % "test"
     )
   )
 

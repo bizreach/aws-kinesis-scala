@@ -46,6 +46,10 @@ package object kinesis {
   val BufferedAmazonKinesisClient = BufferedAmazonKinesis
 
 
+  private[this] implicit class JListConverters[A](list: java.util.List[A]) {
+    def immutableSeq: Seq[A] = list.asScala.toSeq
+  }
+
   case class AddTagsToStreamRequest(streamName: String,
                                     tags: Map[String, String],
                                     requestMetricCollector: Option[RequestMetricCollector] = None)
@@ -108,7 +112,7 @@ package object kinesis {
         streamName = result.getStreamDescription.getStreamName,
         streamARN = result.getStreamDescription.getStreamARN,
         streamStatus = result.getStreamDescription.getStreamStatus,
-        shards = result.getStreamDescription.getShards.asScala.map { shard =>
+        shards = result.getStreamDescription.getShards.immutableSeq.map { shard =>
           Shard(
             shardId = shard.getShardId,
             parentShardId = shard.getParentShardId,
@@ -147,7 +151,7 @@ package object kinesis {
 
   implicit def convertGetRecordsResult(result: AWSGetRecordsResult): GetRecordsResult = {
     GetRecordsResult(
-      records = result.getRecords.asScala.map { record =>
+      records = result.getRecords.immutableSeq.map { record =>
         Record(
           data           = record.getData.array(),
           sequenceNumber = record.getSequenceNumber,
@@ -197,7 +201,7 @@ package object kinesis {
 
   implicit def convertListStreamsResult(request: AWSListStreamsResult): ListStreamsResult = {
     ListStreamsResult(
-      streamNames = request.getStreamNames.asScala,
+      streamNames = request.getStreamNames.immutableSeq,
       hasMoreStreams = request.getHasMoreStreams
     )
   }
@@ -223,7 +227,7 @@ package object kinesis {
 
   implicit def convertListTagsForStreamResult(result: AWSListTagsForStreamResult): ListTagsForStreamResult = {
     ListTagsForStreamResult(
-      tags = result.getTags.asScala.map { tag =>
+      tags = result.getTags.immutableSeq.map { tag =>
         Tag(key = tag.getKey, value = tag.getValue)
       },
       hasMoreTags = result.getHasMoreTags
@@ -305,7 +309,7 @@ package object kinesis {
   implicit def convertPutRecordsResult(result: AWSPutRecordsResult): PutRecordsResult = {
     PutRecordsResult(
       failedRecordCount = result.getFailedRecordCount,
-      records = result.getRecords.asScala.map { record =>
+      records = result.getRecords.immutableSeq.map { record =>
         PutRecordsResultEntry(
           sequenceNumber = record.getSequenceNumber,
           shardId = record.getShardId,
