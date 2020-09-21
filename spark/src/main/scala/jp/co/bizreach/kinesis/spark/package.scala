@@ -20,9 +20,10 @@ package object spark {
     def saveToKinesis(streamName: String, region: Regions,
                       credentials: SparkAWSCredentials = DefaultCredentials,
                       chunk: Int = recordsMaxCount,
-                      endpoint: Option[String] = None): Unit =
+                      endpoint: Option[String] = None,
+                      partitionKeyFunction: Option[A => String] = None): Unit =
       if (!rdd.isEmpty) rdd.sparkContext.runJob(rdd,
-        new KinesisRDDWriter(streamName, region, credentials, chunk, endpoint).write _)
+        new KinesisRDDWriter(streamName, region, credentials, chunk, endpoint, partitionKeyFunction).write _)
   }
 
 }
