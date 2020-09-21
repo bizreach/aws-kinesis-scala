@@ -11,7 +11,8 @@ import org.slf4j.LoggerFactory
 
 class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
                                     credentials: SparkAWSCredentials,
-                                    chunk: Int, endpoint: Option[String]) extends Serializable {
+                                    chunk: Int, endpoint: Option[String],
+                                    partitionKeyFunction: Option[A => String]) extends Serializable {
   private val logger = LoggerFactory.getLogger(getClass)
 
   def write(task: TaskContext, data: Iterator[A]): Unit = {
@@ -26,7 +27,8 @@ class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
     ){ (z, x) =>
       val (records, failed) = z
       val payload = serialize(x)
-      val entry   = PutRecordsEntry(DigestUtils.sha256Hex(payload), payload)
+      val partitionKey = partitionKeyFunction.map(_(x)).getOrElse(DigestUtils.sha256Hex(payload))
+      val entry   = PutRecordsEntry(partitionKey, payload)
 
       // record exceeds max size
       if (entry.recordSize > recordMaxDataSize)
