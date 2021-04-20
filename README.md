@@ -90,6 +90,21 @@ client.putRecord(request)
 client.putRecordWithRetry(request)
 ```
 
+For batch processing to Kinesis Firehose:
+
+```scala
+val request = PutRecordBatchRequest(
+  deliveryStreamName = "firehose-example",
+  records             = Seq("data".getBytes("UTF-8"), "data".getBytes("UTF-8"))
+)
+
+// not retry
+client.putRecordBatch(request)
+
+// retry
+client.putRecordBatchWithRetry(request)
+```
+
 ## [Apache Spark][]
 
 aws-kinesis-spark provides integration with Spark: for writing, methods that work on any `RDD`.
